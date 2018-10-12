@@ -1,0 +1,29 @@
+{% block body %}
+<title>{{catagory.name}}</title>
+
+
+
+
+<div class='catagories'>Catagories</div>
+
+
+<div class='catagory_list'>
+{% for catagory in catagories %}
+<div class='caragory_item'>
+<a href={{ url_for('itemInCatagory',catagory_name = catagory.name) }} > {{catagory.name}} </a>
+</div>
+{% endfor %}
+</div>
+
+
+
+<div class=catagory_items>{{catagory.name}} items ( {{counter}} )</div>
+{% for item in items %}
+<div class=item_list>
+<a href={{ url_for('itemDescription',catagory_name = catagory.name, item_name = item.title) }} > {{item.title}} </a>
+</div>
+{% endfor %}
+
+
+
+{% endblock %}

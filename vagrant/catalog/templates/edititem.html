@@ -1,14 +1,14 @@
 {% block body %}
-<title>New item</title>
+<title>Edit item</title>
   <h2>New item</h2>
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
-  <form action={{url_for('add_item')}} method=post id=catagoryform>
+  <form action={{url_for('add_item')}} method=post>
     <h3>Title:</h3>
       <input type=text name=title>
     <h3>Description:</h3>
       <input type=text name=description>
     <h3>Catagory:</h3>
-      <select name=catagory form=catagoryform>
+      <select>
         <option value="Cloths">Cloths</option>
         <option value="Electronics">Electronics</option>
         <option value="Books">Books</option>
@@ -21,6 +21,9 @@
       <br>
       <br>
       <br>
-    <input type=submit value=Add_item>
+    <input type=submit value=Submit>
+  </form>
+  <form action={{url_for('home')}} method=post>
+    <input type=submit value=Cancel>
   </form>
 {% endblock %}

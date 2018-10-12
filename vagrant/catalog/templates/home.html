@@ -4,16 +4,17 @@
 
 
 
-<div>Catagory list</dev>
+<div>Catagory list</div>
 
 
 
 {% for i in catagory %}
 <div>
-<a href={{ url_for('itemInCatalog',catagory_name = i.name) }} > {{i.name}} </a>
-<br>
+<a href={{ url_for('itemInCatagory',catagory_name = i.name) }} > {{i.name}} </a>
 </div>
 {% endfor %}
+
+
 
 
 

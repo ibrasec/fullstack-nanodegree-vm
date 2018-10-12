@@ -1,0 +1,28 @@
+{% block body %}
+<title>{{catagory.name}}</title>
+
+
+
+
+<div>Catagory App</div>
+
+
+<div class='catagory_list'>
+{% for i in catagory %}
+<div class='caragory_item'>
+<a href={{ url_for('itemInCatalog',catagory_name = i.name) }} > {{i.name}} </a>
+</div>
+{% endfor %}
+</div>
+
+
+{% for i in items %}
+<div>
+
+{{i.title}}
+</div>
+{% endfor %}
+
+
+
+{% endblock %}
