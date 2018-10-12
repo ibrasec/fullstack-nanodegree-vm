@@ -1,0 +1,21 @@
+{% block body %}
+<title>Home Page</title>
+
+
+
+
+<div>Catagory list</dev>
+
+
+
+{% for i in catagory %}
+<div>
+<a href={{ url_for('itemInCatalog',catagory_name = i.name) }} > {{i.name}} </a>
+<br>
+</div>
+{% endfor %}
+
+
+
+
+{% endblock %}
