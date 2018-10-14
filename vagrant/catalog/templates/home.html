@@ -2,21 +2,22 @@
 <title>Home Page</title>
 
 
-
-
-<div>Catagory list</div>
-
-
-
-{% for i in catagory %}
 <div>
-<a href={{ url_for('itemInCatagory',catagory_name = i.name) }} > {{i.name}} </a>
-</div>
+<h3>Catagory list</h3>
+{% for catagory in catagories %}
+<a href={{ url_for('itemInCatagory',catagory_name = catagory.name) }} > {{catagory.name}} </a>
+<br>
 {% endfor %}
+</div>
 
+<div>
+<a href={{ url_for('add_item') }} > Add item </a>
+<h3>Latest items</h3>
+{% for item in items %}
 
-
-
-
+<a href={{ url_for('itemInCatagory',catagory_name = item.title) }} > {{ item.title }}  {{ catagories[0].name }} ( {{ item.catagory_id }} ) </a>
+<br>
+{% endfor %}
+</div>
 
 {% endblock %}

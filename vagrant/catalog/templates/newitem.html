@@ -9,15 +9,11 @@
       <input type=text name=description>
     <h3>Catagory:</h3>
       <select name=catagory form=catagoryform>
-        <option value="Cloths">Cloths</option>
-        <option value="Electronics">Electronics</option>
-        <option value="Books">Books</option>
-        <option value="Software">Software</option>
-        <option value="toys">Toys</option>
-        <option value="food">Food</option>
-        <option value="sports">Sports</option>
-        <option value="other">Other</option>
+        {% for catagory in catagories %}
+        <option value="{{catagory.name}}">{{catagory.name}}</option>
+        {% endfor %}
         </select> 
+
       <br>
       <br>
       <br>

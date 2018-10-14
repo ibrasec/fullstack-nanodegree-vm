@@ -1,4 +1,4 @@
-from sqlalchemy import Column,Integer,String
+from sqlalchemy import Column,Integer,String,ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import create_engine
@@ -42,23 +42,44 @@ class User(Base):
     	return user_id
 
 
+class Catagory(Base):
+    __tablename__='catagory'
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    
+    @property
+    def serialize(self):
+        return {
+                'id' : self.id,
+                'name' : self.name
+                }
+
+
 class Item(Base):
     __tablename__='item'
     id = Column(Integer, primary_key=True)
-    #cat_id = Column(Integer, foreign_key=True)
+    catagory_id = Column(Integer, ForeignKey("catagory.id"),nullable=False)
     title = Column(String)
     description = Column(String)
-    created_by = Column(String)
+    #catagory = Column(String)
+    #created_by = Column(String)
 
     @property
     def serialize(self):
         return {
                 'id' : self.id,
                 'title' : self.title,
-                'description': self.description
+                'description': self.description,
+                'catagory': self.catagory
                 }
 
 
-engine = create_engine('sqlite:///catalog.db')
+
+
+engine = create_engine('sqlite:///catalog.db',pool_pre_ping=True)
+
 
 Base.metadata.create_all(engine)
+
+
+

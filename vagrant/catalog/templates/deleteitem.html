@@ -1,0 +1,21 @@
+{% block body %}
+
+
+<div>Catagory App</div>
+
+
+<div class='item_description'>
+<h3>Delete Item</h3>
+  <form action={{url_for('delete_item', item_name= item_name ) }} method=post id=catagoryform>
+    <p>Are you sure you want to delete {{item_name}}</p>
+    <input type=submit value=Submit>
+  </form>
+
+  <form action={{url_for('home')}} method=post>
+    <input type=submit value=Cancel>
+  </form>
+
+</div>
+
+
+{% endblock %}
