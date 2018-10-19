@@ -10,9 +10,11 @@
 <br>
 {% endfor %}
 
-
+    {% if session.logged_in %}
 <div>
-<a href={{ url_for('add_item') }} > Add item </a>
+<a  class="nav-link text-danger" href={{ url_for('add_item') }} > Add item </a>
+    {% endif %}
+
 <h3>Latest items</h3>
 {% for item in items %}
 {% set cat_id =   item.catagory_id -1 %}

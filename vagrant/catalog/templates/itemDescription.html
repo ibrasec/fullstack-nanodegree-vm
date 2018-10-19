@@ -5,7 +5,7 @@
 <div class='item_description'>
 <p>{{item.description}}<p>
 <br>
-    {% if session.logged_in %}
+    {% if session.logged_in and session.username == item.author %}
     <a href={{ url_for('edit_item', item_name = item.title ) }}>Edit</a> | <a href={{ url_for('delete_item', item_name = item.title )}}> Delete </a>
     {% endif %}
 </div>

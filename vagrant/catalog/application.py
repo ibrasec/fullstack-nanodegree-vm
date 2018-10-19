@@ -25,11 +25,6 @@ from flask import session, app
 # login page
 
 
-
-
-
-
-
 auth = HTTPBasicAuth()
 
 engine = create_engine('sqlite:///catalog.db',connect_args={'check_same_thread':False})
@@ -39,22 +34,6 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 app = Flask(__name__)
-
-###################################################
-# default adding catagories if the database is lost
-def CreateCatagories():
-    catagories=session.query(Catagory).all()
-    if catagories:
-        return 'catagories exists'
-    catagory_list = ['Cloths','Electronics','Books','Software','toys','food','sports','other']  
-    for cat in catagory_list:
-        catagory = Catagory(name=cat)
-        session.add(catagory)
-        session.commit()
-
-
-#CreateCatagories()
-###################################################
 
 
 # User Session expires after 5 minutes
@@ -170,16 +149,14 @@ def get_user(id):
     return jsonify({'username': user.username, 'password' : user.password_hash})
 
 
+# Route page section ----------------------
 
 # home page
 @app.route('/', methods=['GET','POST'])
 def home():
     catagories = session.query(Catagory).all()
-    items = session.query(Item).all()
+    items = session.query(Item).order_by(Item.date.desc()).limit(10)
     return render_template('home.html',catagories = catagories, items = items )
-
-
-
 
 
 # items per catagory page
@@ -191,11 +168,6 @@ def itemInCatagory(catagory_name):
     return render_template('catagory_items.html',catagories = catagories, catagory = catagory, items = items, counter = len(items))
 
 
-
-
-
-
-
 # item description page
 @app.route('/catalog/<catagory_name>/<item_name>')
 def itemDescription(catagory_name, item_name):
@@ -203,9 +175,9 @@ def itemDescription(catagory_name, item_name):
     return render_template('itemDescription.html', item = item)
 
 
-
 # create item page
 @app.route('/catalog/newitem', methods = [ 'GET','POST' ] )
+@is_logged_in
 def add_item():
     if request.method == 'GET':
         #return 'insinde add item'
@@ -222,38 +194,40 @@ def add_item():
         item.description = description
         catagory_object = session.query(Catagory).filter_by(name = catagory).one()
         item.catagory_id = catagory_object.id
+        item.author = login_session['username']
         session.add(item)
         session.commit()
         return redirect('/',302)
         #return jsonify({'catagory_item':item.title})
 
 
-
 # edit item page
 @app.route('/catalog/<item_name>/edit', methods =['GET','POST'])
 @is_logged_in
 def edit_item( item_name ):
+    item = session.query(Item).filter_by(title = item_name).one() 
     if request.method == 'GET':
         #return 'insinde add item'
         catagories = session.query(Catagory).all()
         return render_template('edititem.html',catagories=catagories, item_name = item_name)
     elif request.method == 'POST':
-        #
-        item = session.query(Item).filter_by(title = item_name).one() 
-        # deleting the previouse item
-        session.delete(item)
-        session.commit()
-        # Adding the passed data 
-        title_ = request.form['title']
-        catagory = request.form['catagory']
-        description = request.form['description']
-        item = Item(title = title_)
-        item.description = description
-        catagory_object = session.query(Catagory).filter_by(name = catagory).one()
-        item.catagory_id = catagory_object.id
-        session.add(item)
-        session.commit()
-        return jsonify({'catagory_item':item.title})
+        if login_session['username'] == item.author:
+            # deleting the previouse item
+            session.delete(item)
+            session.commit()
+            # Adding the passed data 
+            title_ = request.form['title']
+            catagory = request.form['catagory']
+            description = request.form['description']
+            item = Item(title = title_)
+            item.description = description
+            catagory_object = session.query(Catagory).filter_by(name = catagory).first()
+            item.catagory_id = catagory_object.id
+            session.add(item)
+            session.commit()
+            return jsonify({'catagory_item':item.title})
+        else:
+            return 'You are not authorized to Edit this item'
 
 
 # delete item page
@@ -265,11 +239,13 @@ def delete_item(item_name):
     if request.method == 'GET':
         return render_template('deleteitem.html', item_name = item_name)
     elif request.method == 'POST':
-        item = session.query(Item).filter_by(title = item_name).one()
-        session.delete(item)
-        session.commit()
-        return redirect('/',302)
-
+        if login_session['username'] == item.author:
+            item = session.query(Item).filter_by(title = item_name).one()
+            session.delete(item)
+            session.commit()
+            return redirect('/',302)
+        else:
+            return 'You are not authorized to Delete this item'
 
 
 # catalog API
@@ -285,6 +261,8 @@ def catagory_api():
         output.append( catagory_dict )
 
     return jsonify({'catagory':output})
+
+
 
 
 if __name__ == '__main__':
