@@ -14,7 +14,7 @@ import httplib2
 from flask import make_response
 import requests
 
-
+from functools import wraps
 import random,string
 
 # create a state token to prevent requests
@@ -50,6 +50,19 @@ def CreateCatagories():
 #CreateCatagories()
 ###################################################
 
+
+
+# check if the user is logged-in
+def is_logged_in(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in login_session:
+            return f(*args, **kwargs)
+        else:
+            #flash('','danger')
+            #return redirect(url_for('login'))
+            return 'You are unauthorized'
+    return wrap
 
 
 
@@ -129,23 +142,23 @@ def signup():
     session.add(user)
     session.commit()
     return redirect(url_for('login'),302)
-    #return jsonify({ 'username': user.username }), 201, {'Location': url_for('get_user', id = user.id, _external = True)}
 
 
 
+# just for checking
+# to be deleted once done troubleshooting
 @app.route('/users/<int:id>')
 def get_user(id):
     user = session.query(User).filter_by(id=id).one()
     if not user:
         abort(400)
-    return jsonify({'username': user.username})
+    return jsonify({'username': user.username, 'password' : user.password_hash})
 
 
 
 # home page
 @app.route('/', methods=['GET','POST'])
 def home():
-    print 'asd',auth.username
     catagories = session.query(Catagory).all()
     items = session.query(Item).all()
     return render_template('home.html',catagories = catagories, items = items )
@@ -157,10 +170,8 @@ def home():
 # items per catagory page
 @app.route('/catalog/<catagory_name>/items')
 def itemInCatagory(catagory_name):
-    print 'inside itemincata',catagory_name
     catagories = session.query(Catagory).all()
     catagory = session.query(Catagory).filter_by(name = catagory_name).first()
-    print catagory
     items = session.query(Item).filter_by(catagory_id = catagory.id).all()
     return render_template('catagory_items.html',catagories = catagories, catagory = catagory, items = items, counter = len(items))
 
@@ -205,6 +216,7 @@ def add_item():
 
 # edit item page
 @app.route('/catalog/<item_name>/edit', methods =['GET','POST'])
+@is_logged_in
 def edit_item( item_name ):
     if request.method == 'GET':
         #return 'insinde add item'
@@ -244,17 +256,22 @@ def delete_item(item_name):
         return redirect('/',302)
 
 # catalog API
-@app.route('/catalog.json')
-def catalog_json():
-    item = session.query(Item).all()
-    return 'json-catalog'
-    #item = session.query(Item).all()
-    #return jsonify( { 'catalog':[i for i in item] })
+@app.route('/catagory.json')
+def catagory_api():
+    output = []
+    catagories = session.query(Catagory).all()
+    for catagory in catagories:
+        catagory_dict = catagory.serialize 
+        items = session.query(Item).filter_by(catagory_id = catagory.id).all()
+        for item in items:
+            catagory_dict['items'] = list( item.serialize  )
+        output.append( catagory_dict )
 
+    return jsonify({'catagory':output})
 
 
 if __name__ == '__main__':
-    app.secret_key='hellothisissecret123'
+    app.secret_key=''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
     app.debug = True
     #app.config['SECRET_KEY'] = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
     app.run(host='0.0.0.0', port=5000)

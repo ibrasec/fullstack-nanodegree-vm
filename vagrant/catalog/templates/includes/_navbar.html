@@ -3,16 +3,18 @@
     <div >
         <ul class="nav justify-content-start">
           <li class="nav-item">
-            <a class="nav-link active text-white" href="#">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link text-white" href="#">Register</a>
+            <a class="nav-link active text-white" href="{{ url_for('home') }}">Home</a>
           </li>
           <li class="nav-item">
             {% if session.logged_in %}
             <a class="nav-link text-white" href="{{ url_for('logout') }}">Logout</a>
             {% else %} 
+          <li class="nav-item">
+            <a class="nav-link text-white" href="{{ url_for('signup') }}">Sign-up</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link disabled text-white " href="{{ url_for('login') }}">Login</a>
+          </li>
             {% endif %}
           </li>
         </ul>

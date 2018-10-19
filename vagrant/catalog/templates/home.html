@@ -2,23 +2,14 @@
 
 {% block body %}
 <title>Home Page</title>
-{{session}}
-<div class=metanav>
-    {% if not session.logged_in %}
-        <a href="{{ url_for('login') }}">log in</a>
-        <a href="{{ url_for('signup') }}">Sign-up</a>
-    {% else %}
-        <a href="{{ url_for('logout') }}">log out</a>
-    {% endif %}
-</div>
 
-<div>
+
 <h3>Catagory list</h3>
 {% for catagory in catagories %}
 <a href={{ url_for('itemInCatagory',catagory_name = catagory.name) }} > {{catagory.name}} </a>
 <br>
 {% endfor %}
-</div>
+
 
 <div>
 <a href={{ url_for('add_item') }} > Add item </a>
