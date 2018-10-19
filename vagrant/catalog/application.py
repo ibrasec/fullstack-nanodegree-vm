@@ -17,9 +17,15 @@ import requests
 from functools import wraps
 import random,string
 
+from datetime import timedelta
+from flask import session, app
+
 # create a state token to prevent requests
 # store it in the session for later validation
 # login page
+
+
+
 
 
 
@@ -49,6 +55,13 @@ def CreateCatagories():
 
 #CreateCatagories()
 ###################################################
+
+
+# User Session expires after 5 minutes
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(minutes=5)
 
 
 
@@ -141,7 +154,9 @@ def signup():
     user.hash_password(password)
     session.add(user)
     session.commit()
-    return redirect(url_for('login'),302)
+    login_session['logged_in'] = True
+    login_session['username'] = user.username
+    return redirect(url_for('home'),302)
 
 
 
@@ -243,7 +258,7 @@ def edit_item( item_name ):
 
 # delete item page
 @app.route('/catalog/<item_name>/delete', methods = ['GET','POST'])
-@auth.login_required
+@is_logged_in
 def delete_item(item_name):
     print 'inside delete function'
     print g,dir(g),'user' in g
@@ -254,6 +269,8 @@ def delete_item(item_name):
         session.delete(item)
         session.commit()
         return redirect('/',302)
+
+
 
 # catalog API
 @app.route('/catagory.json')

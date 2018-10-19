@@ -2,14 +2,6 @@
 
 {% block body %}
 
-{{g.user.username}}
-<div class=metanav>
-    {% if not g.user %}
-        <a href="{{ url_for('login') }}">log in</a>
-    {% else %}
-        <a href="{{ url_for('logout') }}">log out</a>
-    {% endif %}
-</div>
 
 
 <div>Catagory App</div>

@@ -61,8 +61,7 @@ class Item(Base):
     catagory_id = Column(Integer, ForeignKey("catagory.id"),nullable=False)
     title = Column(String)
     description = Column(String)
-    #catagory = Column(String)
-    #created_by = Column(String)
+    #author = Column(String)
 
     @property
     def serialize(self):
