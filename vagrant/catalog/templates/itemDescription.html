@@ -1,8 +1,14 @@
 {% block body %}
 <title>{{item.title}}</title>
 
-
-
+{{g.user.username}}
+<div class=metanav>
+    {% if not g.user %}
+        <a href="{{ url_for('login') }}">log in</a>
+    {% else %}
+        <a href="{{ url_for('logout') }}">log out</a>
+    {% endif %}
+</div>
 
 <div>Catagory Apps</div>
 
@@ -10,7 +16,9 @@
 <div class='item_description'>
 <p>{{item.description}}<p>
 <br>
-<a href={{ url_for('edit_item', item_name = item.title ) }}>Edit</a> | <a href={{ url_for('delete_item', item_name = item.title )}}> Delete </a>
+{% if g.user %}
+    <a href={{ url_for('edit_item', item_name = item.title ) }}>Edit</a> | <a href={{ url_for('delete_item', item_name = item.title )}}> Delete </a>
+{% endif %}
 </div>
 
 

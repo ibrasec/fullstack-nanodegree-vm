@@ -2,6 +2,13 @@
 <title>{{catagory.name}}</title>
 
 
+<div class=metanav>
+    {% if not g.user %}
+        <a href="{{ url_for('login') }}">log in</a>
+    {% else %}
+        <a href="{{ url_for('logout') }}">log out</a>
+    {% endif %}
+</div>
 
 
 <div class='catagories'>Catagories</div>

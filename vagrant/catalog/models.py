@@ -76,7 +76,7 @@ class Item(Base):
 
 
 
-engine = create_engine('sqlite:///catalog.db',pool_pre_ping=True)
+engine = create_engine('sqlite:///catalog.db',connect_args={'check_same_thread':False})
 
 
 Base.metadata.create_all(engine)

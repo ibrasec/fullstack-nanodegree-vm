@@ -1,0 +1,25 @@
+<nav class="navbar navbar-toggleable-md navbar-light bg-info">
+  <div class="container">
+    <div >
+        <ul class="nav justify-content-start">
+          <li class="nav-item">
+            <a class="nav-link active text-white" href="#">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white" href="#">Register</a>
+          </li>
+          <li class="nav-item">
+            {% if session.logged_in %}
+            <a class="nav-link text-white" href="{{ url_for('logout') }}">Logout</a>
+            {% else %} 
+            <a class="nav-link disabled text-white " href="{{ url_for('login') }}">Login</a>
+            {% endif %}
+          </li>
+        </ul>
+    </div>
+   {% if session.logged_in %}
+    Welcome {{ session.username}}
+   {% endif %}
+  </div>
+</nav>  
+

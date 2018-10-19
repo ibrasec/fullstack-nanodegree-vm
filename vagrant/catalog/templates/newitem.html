@@ -1,12 +1,23 @@
+{% extends "layout.html" %}
 {% block body %}
 <title>New item</title>
+
+<div class=metanav>
+    {% if not g.user %}
+        <a href="{{ url_for('login') }}">log in</a>
+    {% else %}
+        <a href="{{ url_for('logout') }}">log out</a>
+    {% endif %}
+</div>
+
+
   <h2>New item</h2>
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
   <form action={{url_for('add_item')}} method=post id=catagoryform>
     <h3>Title:</h3>
-      <input type=text name=title>
+      <input type=text name=title required>
     <h3>Description:</h3>
-      <input type=text name=description>
+      <textarea name="description"  style="width: 400px; height: 100px;" required></textarea>
     <h3>Catagory:</h3>
       <select name=catagory form=catagoryform>
         {% for catagory in catagories %}
@@ -18,5 +29,8 @@
       <br>
       <br>
     <input type=submit value=Add_item>
+  </form>
+  <form action={{url_for('home')}} method=post>
+    <input type=submit value=Cancel>
   </form>
 {% endblock %}

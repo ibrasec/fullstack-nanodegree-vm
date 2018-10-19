@@ -1,6 +1,16 @@
+{% extends 'layout.html' %}
+
 {% block body %}
 <title>Home Page</title>
-
+{{session}}
+<div class=metanav>
+    {% if not session.logged_in %}
+        <a href="{{ url_for('login') }}">log in</a>
+        <a href="{{ url_for('signup') }}">Sign-up</a>
+    {% else %}
+        <a href="{{ url_for('logout') }}">log out</a>
+    {% endif %}
+</div>
 
 <div>
 <h3>Catagory list</h3>
@@ -14,8 +24,9 @@
 <a href={{ url_for('add_item') }} > Add item </a>
 <h3>Latest items</h3>
 {% for item in items %}
+{% set cat_id =   item.catagory_id -1 %}
 
-<a href={{ url_for('itemInCatagory',catagory_name = item.title) }} > {{ item.title }}  {{ catagories[0].name }} ( {{ item.catagory_id }} ) </a>
+<a href={{ url_for('itemDescription', item_name = item.title, catagory_name = catagories[ cat_id ].name ) }} > {{ item.title }}</a> ( {{ catagories[ cat_id ].name }} )
 <br>
 {% endfor %}
 </div>
