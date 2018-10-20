@@ -11,7 +11,7 @@
 <script>
     gapi.load('auth2', function() {
       auth2 = gapi.auth2.init({
-        client_id: '13955994086-l8qppps2j9tdun4kfso2ekl8u5458l7i.apps.googleusercontent.com',
+        client_id: '757176780464-mf69hla54274o74grpg40kjt55uuuqiq.apps.googleusercontent.com',
         // Scopes to request in addition to 'profile' and 'email'
         //scope: 'additional_scope'
       });
@@ -82,12 +82,11 @@ function signInCallback(json) {
   // authResult = JSON.parse(json);
   authResult = json;
   if (authResult['code']) {
-    console.log('We got authResult, Sending it to the server...')
     // Hide the sign-in button now that the user is authorized, for example:
     $('#signinButton').attr('style', 'display: none');
       $('#result').html('One-Time Auth Code:</br>'+ authResult['code'] + '')
     // Send the code to the server
-    $.ajax({
+    /*$.ajax({
       type: 'POST',
       url: '/oauth/google',
       processData: false,
@@ -103,9 +102,8 @@ function signInCallback(json) {
           $('#result').html('Failed to make a server-side call. Check your configuration and console.');
         }
       }
-    });
-    console.log(authResult['code'])
-   }
+    }); */
+  }
 }
 </script>
 
@@ -138,8 +136,8 @@ function signInCallback(json) {
 <!--END GOOGLE SIGN IN CODE -->
 
 
-<!--Newly added from my side to just check -->
-<a href='http://localhost:5000'>Return to home page</a>
+
+
 
 
   </body>

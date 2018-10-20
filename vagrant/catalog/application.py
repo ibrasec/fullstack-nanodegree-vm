@@ -20,9 +20,11 @@ import random,string
 from datetime import timedelta
 from flask import session, app
 
-# create a state token to prevent requests
-# store it in the session for later validation
-# login page
+
+
+CLIENT_ID = json.loads(
+    open('client_secrets.json', 'r').read())['web']['client_id']
+
 
 
 auth = HTTPBasicAuth()
@@ -74,10 +76,89 @@ def verify_password(username_or_token, password):
     return True
 
 
+#####################
+# test lvh.me
+@app.route('/routelvhme')
+def routelvhme():
+    print 'We are inside routelvhme'
+    return redirect('/clientOAuth')
 
 
+##############
 
 
+@app.route('/clientOAuth')
+def start():
+    return render_template('clientOAuth.html')
+
+
+@app.route('/oauth/<provider>', methods = ['POST'])
+def login_provider(provider):
+    #STEP 1 - Parse the auth code
+    print 'We Are inside login_provider'
+    print request, dir(request)
+    print  request.data
+    auth_code = request.data
+    print "Step 1 - Complete, received auth code %s" % auth_code
+    if provider == 'google':
+        #STEP 2 - Exchange for a token
+        try:
+            # Upgrade the authorization code into a credentials object
+            oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
+            oauth_flow.redirect_uri = 'postmessage'
+            credentials = oauth_flow.step2_exchange(auth_code)
+        except FlowExchangeError:
+            response = make_response(json.dumps('Failed to upgrade the authorization code.'), 401)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+          
+        # Check that the access token is valid.
+        access_token = credentials.access_token
+        url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)
+        h = httplib2.Http()
+        result = json.loads(h.request(url, 'GET')[1])
+        # If there was an error in the access token info, abort.
+        if result.get('error') is not None:
+            response = make_response(json.dumps(result.get('error')), 500)
+            response.headers['Content-Type'] = 'application/json'
+
+        print "Step 2 Complete! Access Token : %s " % credentials.access_token
+
+        #STEP 3 - Find User or make a new one
+        
+        #Get user info
+        h = httplib2.Http()
+        userinfo_url =  "https://www.googleapis.com/oauth2/v1/userinfo"
+        params = {'access_token': credentials.access_token, 'alt':'json'}
+        answer = requests.get(userinfo_url, params=params)
+      
+        data = answer.json()
+
+        name = data['name']
+        picture = data['picture']
+        email = data['email']
+     
+        #see if user exists, if it doesn't make a new one
+        user = session.query(User).filter_by(email=email).first()
+        if not user:
+            user = User(username = name, picture = picture, email = email)
+            session.add(user)
+            session.commit()
+
+        #STEP 4 - Make token
+        token = user.generate_auth_token(600)
+
+        #STEP 5 - Send back token to the client 
+        return jsonify({'token': token.decode('ascii')})
+        
+        #return jsonify({'token': token.decode('ascii'), 'duration': 600})
+    else:
+        return 'Unrecoginized Provider'
+
+
+# create a state token to prevent requests
+# store it in the session for later validation
+# login page
 @app.route('/token')
 @auth.login_required
 def get_auth_token():
