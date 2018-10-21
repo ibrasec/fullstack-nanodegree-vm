@@ -16,7 +16,7 @@
       {% if messages %}
         {% for message in messages %}
             <span class="d-inline-block" data-toggle="popover" data-content="Disabled popover">
-                <button class="btn btn-dangerous" style="pointer-events: none;" type="button" disabled>{{ messages[0] }}</button>
+                <button class="btn btn-dangerous" style="pointer-events: none;" type="button" disabled>{{ message }}</button>
             </span>
           {% endfor %}
       {% endif %}
