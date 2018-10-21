@@ -42,7 +42,7 @@ app = Flask(__name__)
 @app.before_request
 def make_session_permanent():
     session.permanent = True
-    app.permanent_session_lifetime = timedelta(minutes=5)
+    app.permanent_session_lifetime = timedelta(minutes=15)
 
 
 
@@ -149,6 +149,10 @@ def login_provider(provider):
         token = user.generate_auth_token(600)
 
         #STEP 5 - Send back token to the client 
+        login_session['logged_in'] = True
+        login_session['username']=user.username
+        g.user = user
+        return redirect(url_for('home'),302)
         return jsonify({'token': token.decode('ascii')})
         
         #return jsonify({'token': token.decode('ascii'), 'duration': 600})
@@ -304,8 +308,10 @@ def edit_item( item_name ):
             item.description = description
             catagory_object = session.query(Catagory).filter_by(name = catagory).first()
             item.catagory_id = catagory_object.id
+            item.author = login_session['username']
             session.add(item)
             session.commit()
+            return redirect(url_for('home'),302)
             return jsonify({'catagory_item':item.title})
         else:
             return 'You are not authorized to Edit this item'
