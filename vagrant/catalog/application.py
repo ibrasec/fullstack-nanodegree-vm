@@ -1,5 +1,5 @@
-from models import Item,Catagory, Base, User
-from flask import Flask, jsonify, request, url_for, abort, g, render_template, redirect, session
+from models import Item,Catagory, Base, User 
+from flask import Flask, jsonify, request, url_for, abort, g, render_template, redirect, session, flash
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import create_engine
@@ -186,7 +186,8 @@ def login():
         if username is None or password is None:
             abort(400) # missing arguments
         if not verify_password(username, password):
-            abort(400) # existing user
+            flash("The username or password is incorrect")
+            return redirect('/login',302)
         user = User(username = username)
         user.hash_password(password)
         login_session['logged_in'] = True

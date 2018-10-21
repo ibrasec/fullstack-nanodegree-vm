@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% block body %}
   <h2>Login</h2>
+
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
   <form action="{{ url_for('login') }}" method=post>
     <dl>
@@ -11,5 +12,16 @@
       <dd><input type=submit value=Login>
     </dl>
   </form>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+            <span class="d-inline-block" data-toggle="popover" data-content="Disabled popover">
+                <button class="btn btn-dangerous" style="pointer-events: none;" type="button" disabled>{{ messages[0] }}</button>
+            </span>
+          {% endfor %}
+      {% endif %}
+    {% endwith %}
+  <br>
   <a href="{{ url_for('routelvhme') }}">use third party login</a> 
+
 {% endblock %}
