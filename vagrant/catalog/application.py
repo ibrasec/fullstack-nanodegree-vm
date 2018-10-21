@@ -209,13 +209,15 @@ def signup():
     elif request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        email = request.form['email']
+        print username,password,email
         if username is None or password is None:
             abort(400) # missing arguments
         if session.query(User).filter_by(username = username).first() is not None:
             abort(400) # existing user
-    print 'out of signup if'
     user = User(username = username)
     user.hash_password(password)
+    user.email = email
     session.add(user)
     session.commit()
     login_session['logged_in'] = True
@@ -321,8 +323,7 @@ def edit_item( item_name ):
 @app.route('/catalog/<item_name>/delete', methods = ['GET','POST'])
 @is_logged_in
 def delete_item(item_name):
-    print 'inside delete function'
-    print g,dir(g),'user' in g
+    item = session.query(Item).filter_by(title = item_name).one()    
     if request.method == 'GET':
         return render_template('deleteitem.html', item_name = item_name)
     elif request.method == 'POST':
@@ -330,7 +331,7 @@ def delete_item(item_name):
             item = session.query(Item).filter_by(title = item_name).one()
             session.delete(item)
             session.commit()
-            return redirect('/',302)
+            return redirect(url_for('home'),302)
         else:
             return 'You are not authorized to Delete this item'
 
