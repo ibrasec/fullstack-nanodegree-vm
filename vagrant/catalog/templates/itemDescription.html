@@ -7,7 +7,7 @@
     <h5 class="card-title">{{item.title}}</h5>
     <p class="card-text">{{item.description}}</p>
     <p class="card-text"><small class="text-muted">author: {{item.author}}</small></p>
-    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+    <p class="card-text"><small class="text-muted">Last updated {{ lastupdate }}</small></p>
   </div>
 </div>
     {% if session.logged_in and session.username == item.author %}

@@ -15,10 +15,44 @@ from flask import make_response
 import requests
 
 from functools import wraps
-import random,string
+import random,string, datetime
 
 from datetime import timedelta
 from flask import session, app
+
+
+
+def LastUpdate(item_object):
+    '''
+    a function that returns the delta time from the time the user has created
+    or updated his/her item.
+    The passed item must be an sqlalchemy object
+    example:
+    >>> LastUpdate(item_object)
+    3 seconds
+    >>> LastUpdate(item_object)
+    3 days
+    >>> LastUpdate(item_object)
+    3 hr and 1 min
+    '''
+    delta = datetime.datetime.now() - item_object.date
+    # check if the delta is within days
+    if delta.days > 0:
+        x = lambda x: 'Days' if x > 1 else 'Day'
+        return '%s %s' % ( str( delta.days ), x(delta.days) )
+    # check if the delta is within seconds
+    elif delta.seconds <= 60: 
+        return '%s seconds' % str( delta.seconds ) 
+    # check if the delta is within minutes
+    elif delta.seconds <= 3600:
+        minutes = delta.seconds // 3600
+        x = lambda x: 'minutes' if x > 1 else 'minute'
+        return '%s %s' %( str( minutes ), x( minutes ) )
+    # check if the delta is within hours
+    else:
+        hours =  delta.seconds // 3600 
+        minutes = str( ( delta.seconds - hours * 3600 ) // 60  )
+        return '%s hr and %s min' %(str(hours) , minutes) 
 
 
 
@@ -211,11 +245,11 @@ def signup():
         username = request.form['username']
         password = request.form['password']
         email = request.form['email']
-        print username,password,email
         if username is None or password is None:
             abort(400) # missing arguments
         if session.query(User).filter_by(username = username).first() is not None:
-            abort(400) # existing user
+            flash("This username Already exist")
+            return redirect('/signup',302)
     user = User(username = username)
     user.hash_password(password)
     user.email = email
@@ -253,14 +287,18 @@ def itemInCatagory(catagory_name):
     catagories = session.query(Catagory).all()
     catagory = session.query(Catagory).filter_by(name = catagory_name).first()
     items = session.query(Item).filter_by(catagory_id = catagory.id).all()
-    return render_template('catagory_items.html',catagories = catagories, catagory = catagory, items = items, counter = len(items))
+    return render_template('catagory_items.html',catagories = catagories,
+                         catagory = catagory, items = items,
+                         counter = len(items))
 
 
 # item description page
 @app.route('/catalog/<catagory_name>/<item_name>')
 def itemDescription(catagory_name, item_name):
-    item = session.query(Item).filter_by(title = item_name).one()
-    return render_template('itemDescription.html', item = item)
+    item = session.query(Item).filter_by(title = item_name).first()
+    last_update = LastUpdate(item)
+    return render_template('itemDescription.html', item = item,
+                            lastupdate = last_update )
 
 
 # create item page
@@ -299,6 +337,7 @@ def edit_item( item_name ):
         catagories = session.query(Catagory).all()
         return render_template('edititem.html',catagories=catagories, item_name = item_name)
     elif request.method == 'POST':
+        print type(item.date)
         if login_session['username'] == item.author:
             # deleting the previouse item
             session.delete(item)
