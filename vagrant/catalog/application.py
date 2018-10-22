@@ -35,19 +35,22 @@ def LastUpdate(item_object):
     >>> LastUpdate(item_object)
     3 hr and 1 min
     '''
-    delta = datetime.datetime.now() - item_object.date
+    try:
+        delta = datetime.datetime.now() - item_object.date
+    except:
+        pass
+    # for plural or singular
+    x = lambda x: 's' if x > 1 else ''
     # check if the delta is within days
     if delta.days > 0:
-        x = lambda x: 'Days' if x > 1 else 'Day'
-        return '%s %s' % ( str( delta.days ), x(delta.days) )
+        return '%s day%s' % ( str( delta.days ), x(delta.days) )
     # check if the delta is within seconds
     elif delta.seconds <= 60: 
         return '%s seconds' % str( delta.seconds ) 
     # check if the delta is within minutes
     elif delta.seconds <= 3600:
-        minutes = delta.seconds // 3600
-        x = lambda x: 'minutes' if x > 1 else 'minute'
-        return '%s %s' %( str( minutes ), x( minutes ) )
+        minutes = delta.seconds // 60
+        return '%s minute%s' %( str( minutes ), x( minutes ) )
     # check if the delta is within hours
     else:
         hours =  delta.seconds // 3600 
@@ -122,7 +125,7 @@ def routelvhme():
 
 
 @app.route('/clientOAuth')
-def start():
+def startOAuth():
     return render_template('clientOAuth.html')
 
 
@@ -187,7 +190,7 @@ def login_provider(provider):
         login_session['username']=user.username
         g.user = user
         return redirect(url_for('home'),302)
-        return jsonify({'token': token.decode('ascii')})
+        #return jsonify({'token': token.decode('ascii')})
         
         #return jsonify({'token': token.decode('ascii'), 'duration': 600})
     else:
@@ -335,7 +338,7 @@ def edit_item( item_name ):
     if request.method == 'GET':
         #return 'insinde add item'
         catagories = session.query(Catagory).all()
-        return render_template('edititem.html',catagories=catagories, item_name = item_name)
+        return render_template('edititem.html',catagories=catagories, item_name = item.title)
     elif request.method == 'POST':
         print type(item.date)
         if login_session['username'] == item.author:
@@ -376,19 +379,43 @@ def delete_item(item_name):
             return 'You are not authorized to Delete this item'
 
 
-# catalog API
-@app.route('/catagory.json')
-def catagory_api():
+# return all catalog API
+@app.route('/catalog.json')
+def catalog_api():
     output = []
     catagories = session.query(Catagory).all()
     for catagory in catagories:
-        catagory_dict = catagory.serialize 
+        catagory_dict = catagory.serialize   # {id:'',name:''}
+        catagory_dict['items'] = []
         items = session.query(Item).filter_by(catagory_id = catagory.id).all()
+        # {id:,name:,title:[{},{},{}]}
         for item in items:
-            catagory_dict['items'] = list( item.serialize  )
+            catagory_dict['items'].append( item.serialize  )
         output.append( catagory_dict )
 
     return jsonify({'catagory':output})
+
+
+# return a certain catagory api
+@app.route('/catalog/<catagory_name>.json')
+def catagory_api(catagory_name):
+    catagory = session.query(Catagory).filter_by(name = catagory_name).one()
+    items = session.query(Item).filter_by(catagory_id = catagory.id).all()
+    if items != None and catagory !=None:
+        output = [ item.serialize for item in items]
+        return jsonify({catagory_name: output })
+    return 'Item or catagory not found'
+    
+
+# return a certain items api
+@app.route('/catalog/<catagory_name>/<item_name>.json')
+def item_api(catagory_name,item_name):
+    item = session.query(Item).filter_by(title = item_name).first()
+    if item != None:
+        return jsonify({item_name: item.serialize })  
+    return 'Item or catagory not found'
+
+
 
 
 

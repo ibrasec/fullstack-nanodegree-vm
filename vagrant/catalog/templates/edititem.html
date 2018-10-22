@@ -1,12 +1,12 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<title>Edit item {{item_name}}</title>
-  <h2>Edit item</h2>
+<title>Edit item </title>
+  <h2>Edit item {{item_name}}</h2>
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
-  <form action={{url_for('edit_item', catagories = catagories, item_name=item_name)}} method=post id=catagoryform>
+  <form action={{url_for('edit_item', catagories = catagories, item_name = item_name)}} method=post id=catagoryform>
     <h3>Title:</h3>
-      <input type=text name=title required>
+      <input type="text"  name=title placeholder="{{ item_name }}" required>
     <h3>Description:</h3>
       <textarea name="description"  style="width: 400px; height: 100px;" required></textarea>
     <h3>Catagory:</h3>
