@@ -4,7 +4,7 @@
 <title>Edit item </title>
   <h2>Edit item {{item_name}}</h2>
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
-  <form action={{url_for('edit_item', catagories = catagories, item_name = item_name)}} method=post id=catagoryform>
+  <form action={{url_for('edit_item', catagories = catagories, item_name = item_name)}} enctype=multipart/form-data method=post id=catagoryform>
     <h3>Title:</h3>
       <input type="text"  name=title placeholder="{{ item_name }}" required>
     <h3>Description:</h3>
@@ -16,8 +16,10 @@
         {% endfor %}
         </select> 
       <br>
+      <p><input type=file name=file></p>
       <br>
       <br>
+
     <input type=submit value=Submit>
   </form>
   <form action={{url_for('home')}} method=post>

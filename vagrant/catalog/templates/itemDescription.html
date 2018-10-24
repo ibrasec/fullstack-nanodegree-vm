@@ -1,20 +1,22 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<div class="card mb-3">
-  <img class="card-img-top" src="..." alt="Card image cap">
+<div class="rounded mx-auto d-block card mb-3 mt-4 w-50 p-3" >
+  <img class=" card-img-top" src="/static/img/{{item.image}}" alt="Card image cap" width="25" height="250">
   <div class="card-body">
     <h5 class="card-title">{{item.title}}</h5>
     <p class="card-text">{{item.description}}</p>
-    <p class="card-text"><small class="text-muted">author: {{item.author}}</small></p>
-    <p class="card-text"><small class="text-muted">Last updated {{ lastupdate }}</small></p>
+    <p class="card-text"><small class="text-muted">author: {{item.author}}</small>
+    <span class="float-md-right card-text"><small class="text-muted">Last updated {{ lastupdate }}</small>
+    </span>
+    </p>
   </div>
-</div>
     {% if session.logged_in and session.username == item.author %}
     <a class="btn btn-primary" href={{ url_for('edit_item', item_name = item.title ) }}>Edit</a> 
     <a class="btn btn-primary" href={{ url_for('delete_item', item_name = item.title )}}> Delete </a>
     {% endif %}
 </div>
+
 
 
 {% endblock %}

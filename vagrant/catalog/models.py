@@ -58,13 +58,13 @@ class Catagory(Base):
 
 class Item(Base):
     __tablename__='item'
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     catagory_id = Column(Integer, ForeignKey("catagory.id"),nullable=False)
     title = Column(String)
     description = Column(String)
     author = Column(String)
     date = Column(DateTime, default=datetime.datetime.utcnow)
-
+    image = Column(String)
     @property
     def serialize(self):
         return {

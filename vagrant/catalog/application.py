@@ -15,28 +15,84 @@ from flask import make_response
 import requests
 
 from functools import wraps
-import random,string, datetime
+import os, random,string, datetime
 
 from datetime import timedelta
 from flask import session, app
 
+# for uploading
+from werkzeug.utils import secure_filename
+from flask import send_from_directory
 
 
-def LastUpdate(item_object):
+
+UPLOAD_FOLDER = './static/img/'
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+
+
+
+app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            pass
+            # make the image default image
+            item.image='picture.png'
+        else:
+            file = request.files['file']
+        # if user does not select file, browser also
+        # submit a empty part without filename
+            if allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                item.image=filename
+    return '''
+    <!doctype html>
+    <title>Upload new File</title>
+    <h1>Upload new File</h1>
+    <form method=post enctype=multipart/form-data>
+      <p><input type=file name=file>
+         <input type=submit value=Upload>
+    </form>
+    '''
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'],
+                               filename)
+
+
+
+
+
+
+
+
+
+
+def LastUpdate(item_date):
     '''
     a function that returns the delta time from the time the user has created
     or updated his/her item.
-    The passed item must be an sqlalchemy object
+    The passed item must be of datetime type
     example:
-    >>> LastUpdate(item_object)
-    3 seconds
-    >>> LastUpdate(item_object)
+    >>> LastUpdate(2018-10-24 11:48:26.168357)
     3 days
-    >>> LastUpdate(item_object)
-    3 hr and 1 min
     '''
     try:
-        delta = datetime.datetime.now() - item_object.date
+        delta = datetime.datetime.now() - item_date
     except:
         pass
     # for plural or singular
@@ -72,14 +128,13 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-app = Flask(__name__)
 
 
 # User Session expires after 5 minutes
-@app.before_request
-def make_session_permanent():
-    session.permanent = True
-    app.permanent_session_lifetime = timedelta(minutes=15)
+#@app.before_request
+#def make_session_permanent():
+#    session.permanent = True
+#    app.permanent_session_lifetime = timedelta(minutes=15)
 
 
 
@@ -112,16 +167,6 @@ def verify_password(username_or_token, password):
     g.user = user
     return True
 
-
-#####################
-# test lvh.me
-@app.route('/routelvhme')
-def routelvhme():
-    print 'We are inside routelvhme'
-    return redirect('/clientOAuth')
-
-
-##############
 
 
 @app.route('/clientOAuth')
@@ -299,7 +344,7 @@ def itemInCatagory(catagory_name):
 @app.route('/catalog/<catagory_name>/<item_name>')
 def itemDescription(catagory_name, item_name):
     item = session.query(Item).filter_by(title = item_name).first()
-    last_update = LastUpdate(item)
+    last_update = LastUpdate(item.date)
     return render_template('itemDescription.html', item = item,
                             lastupdate = last_update )
 
@@ -324,6 +369,14 @@ def add_item():
         catagory_object = session.query(Catagory).filter_by(name = catagory).one()
         item.catagory_id = catagory_object.id
         item.author = login_session['username']
+        if 'file' not in request.files:
+            item.image='picture.png'
+        else:
+            file = request.files['file']
+            if allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                item.image=filename
         session.add(item)
         session.commit()
         return redirect('/',302)
@@ -336,28 +389,44 @@ def add_item():
 def edit_item( item_name ):
     item = session.query(Item).filter_by(title = item_name).one() 
     if request.method == 'GET':
-        #return 'insinde add item'
         catagories = session.query(Catagory).all()
         return render_template('edititem.html',catagories=catagories, item_name = item.title)
     elif request.method == 'POST':
-        print type(item.date)
+        print 'date',item.date
         if login_session['username'] == item.author:
-            # deleting the previouse item
-            session.delete(item)
-            session.commit()
+            ## deleting the previouse item
+            #session.delete(item)
+            #session.commit()
             # Adding the passed data 
             title_ = request.form['title']
             catagory = request.form['catagory']
             description = request.form['description']
-            item = Item(title = title_)
-            item.description = description
             catagory_object = session.query(Catagory).filter_by(name = catagory).first()
-            item.catagory_id = catagory_object.id
-            item.author = login_session['username']
-            session.add(item)
+            #item.catagory_id = catagory_object.id
+            #item = Item(title = title_)
+            item.description = description
+            # check if there is an uploaded image
+            if 'file' not in request.files:
+                print 'file not in request'
+                filename='picture.png'
+            else:
+                print 'file in request'
+                file = request.files['file']
+                if allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    print 'file is allowed', filename
+                    #item.image=filename
+            print 'after if',filename
+            session.query(Item).filter_by(id=item.id).\
+                        update({Item.catagory_id: catagory_object.id,\
+                        Item.title:title_,\
+                        Item.date:datetime.datetime.now(),\
+                        Item.description: description,\
+                        Item.author: login_session['username'],\
+                        Item.image:filename })
             session.commit()
             return redirect(url_for('home'),302)
-            return jsonify({'catagory_item':item.title})
         else:
             return 'You are not authorized to Edit this item'
 
