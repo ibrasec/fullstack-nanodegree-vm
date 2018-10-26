@@ -1,29 +1,23 @@
-from models import Item,Catagory, Base, User 
+from models import Item, Catagory, Base, User 
 from flask import Flask, jsonify, request, url_for, abort, g, render_template, redirect, session, flash
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import create_engine
 from flask import session as login_session
 from flask_httpauth import HTTPBasicAuth
-import json,random,string
-
-#NEW IMPORTS
+import json,random,string, os, datetime
+# NEW IMPORTS
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 import httplib2
 from flask import make_response
 import requests
-
 from functools import wraps
-import os, random,string, datetime
-
 from datetime import timedelta
 from flask import session, app
-
 # for uploading
 from werkzeug.utils import secure_filename
 from flask import send_from_directory
-
 
 
 UPLOAD_FOLDER = './static/img/'
@@ -35,6 +29,13 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
+# just to add forbidden page
+def not_authorized():
+    return render_template()
+
+
+def forbidden():
+    return render_template('/forbidden.html')
 
 
 def allowed_file(filename):
@@ -74,21 +75,13 @@ def uploaded_file(filename):
                                filename)
 
 
-
-
-
-
-
-
-
-
 def LastUpdate(item_date):
     '''
     a function that returns the delta time from the time the user has created
     or updated his/her item.
     The passed item must be of datetime type
     example:
-    >>> LastUpdate(2018-10-24 11:48:26.168357)
+    >>> LastUpdate(2018-10-24 11: 48: 26.168357)
     3 days
     '''
     try:
@@ -99,30 +92,29 @@ def LastUpdate(item_date):
     x = lambda x: 's' if x > 1 else ''
     # check if the delta is within days
     if delta.days > 0:
-        return '%s day%s' % ( str( delta.days ), x(delta.days) )
+        return '%s day%s' % (str(delta.days), x(delta.days))
     # check if the delta is within seconds
-    elif delta.seconds <= 60: 
-        return '%s seconds' % str( delta.seconds ) 
+    elif delta.seconds <= 60:
+        return '%s seconds' % str(delta.seconds)
     # check if the delta is within minutes
     elif delta.seconds <= 3600:
         minutes = delta.seconds // 60
-        return '%s minute%s' %( str( minutes ), x( minutes ) )
+        return '%s minute%s' %(str(minutes), x(minutes))
     # check if the delta is within hours
     else:
         hours =  delta.seconds // 3600 
-        minutes = str( ( delta.seconds - hours * 3600 ) // 60  )
-        return '%s hr and %s min' %(str(hours) , minutes) 
+        minutes = str((delta.seconds - hours * 3600) // 60 )
+        return '%s hr and %s min' %(str(hours) , minutes)
 
 
 
-CLIENT_ID = json.loads(
-    open('client_secrets.json', 'r').read())['web']['client_id']
+CLIENT_ID = json.loads(    open('client_secrets.json', 'r').read())['web']['client_id']
 
 
 
 auth = HTTPBasicAuth()
 
-engine = create_engine('sqlite:///catalog.db',connect_args={'check_same_thread':False})
+engine = create_engine('sqlite:///catalog.db', connect_args={'check_same_thread': False})
 
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
@@ -131,10 +123,32 @@ session = DBSession()
 
 
 # User Session expires after 5 minutes
-#@app.before_request
-#def make_session_permanent():
-#    session.permanent = True
-#    app.permanent_session_lifetime = timedelta(minutes=15)
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(minutes=15)
+
+def random_string():
+    return ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
+
+
+@app.before_request
+def csrf_protect():
+    if request.method == "POST":
+        token = login_session.pop('_csrf_token', None)
+        if not token or token != request.form.get('_csrf_token'):
+            abort(403)
+
+def generate_csrf_token():
+    if '_csrf_token' not in login_session:
+        login_session['_csrf_token'] = random_string()
+    return login_session['_csrf_token']
+
+
+app.jinja_env.globals['csrf_token'] = generate_csrf_token
+
+
+
 
 
 
@@ -145,9 +159,7 @@ def is_logged_in(f):
         if 'logged_in' in login_session:
             return f(*args, **kwargs)
         else:
-            #flash('','danger')
-            #return redirect(url_for('login'))
-            return 'You are unauthorized'
+             return render_template('/forbidden.html')
     return wrap
 
 
@@ -163,15 +175,10 @@ def verify_password(username_or_token, password):
         user = session.query(User).filter_by(username = username_or_token).first()
         if not user or not user.verify_password(password):
             return False
-    print 'inside verif password to return user',user
     g.user = user
     return True
 
 
-
-@app.route('/clientOAuth')
-def startOAuth():
-    return render_template('clientOAuth.html')
 
 
 @app.route('/oauth/<provider>', methods = ['POST'])
@@ -193,7 +200,6 @@ def login_provider(provider):
             response = make_response(json.dumps('Failed to upgrade the authorization code.'), 401)
             response.headers['Content-Type'] = 'application/json'
             return response
-          
         # Check that the access token is valid.
         access_token = credentials.access_token
         url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)
@@ -203,41 +209,30 @@ def login_provider(provider):
         if result.get('error') is not None:
             response = make_response(json.dumps(result.get('error')), 500)
             response.headers['Content-Type'] = 'application/json'
-
         print "Step 2 Complete! Access Token : %s " % credentials.access_token
-
-        #STEP 3 - Find User or make a new one
-        
-        #Get user info
+        # STEP 3 - Find User or make a new one
+        # Get user info
         h = httplib2.Http()
         userinfo_url =  "https://www.googleapis.com/oauth2/v1/userinfo"
         params = {'access_token': credentials.access_token, 'alt':'json'}
         answer = requests.get(userinfo_url, params=params)
-      
         data = answer.json()
-
         name = data['name']
         picture = data['picture']
         email = data['email']
-     
-        #see if user exists, if it doesn't make a new one
+        # see if user exists, if it doesn't make a new one
         user = session.query(User).filter_by(email=email).first()
         if not user:
             user = User(username = name, picture = picture, email = email)
             session.add(user)
             session.commit()
-
-        #STEP 4 - Make token
+        # STEP 4 - Make token
         token = user.generate_auth_token(600)
-
-        #STEP 5 - Send back token to the client 
+        # STEP 5 - Send back token to the client 
         login_session['logged_in'] = True
         login_session['username']=user.username
         g.user = user
-        return redirect(url_for('home'),302)
-        #return jsonify({'token': token.decode('ascii')})
-        
-        #return jsonify({'token': token.decode('ascii'), 'duration': 600})
+        return redirect(url_for('home'), 302)
     else:
         return 'Unrecoginized Provider'
 
@@ -249,7 +244,7 @@ def login_provider(provider):
 @auth.login_required
 def get_auth_token():
     token = g.user.generate_auth_token()
-    return jsonify({'token':token.decode('ascii')})
+    return jsonify({'token': token.decode('ascii')})
 
 
 # login page
@@ -261,7 +256,6 @@ def login():
         try:
             username = request.form['username']
             password = request.form['password']
-            print username,password
         except:
             username = request.json.get('username')
             password = request.json.get('password')
@@ -269,13 +263,12 @@ def login():
             abort(400) # missing arguments
         if not verify_password(username, password):
             flash("The username or password is incorrect")
-            return redirect('/login',302)
+            return redirect('/login', 302)
         user = User(username = username)
         user.hash_password(password)
         login_session['logged_in'] = True
         login_session['username'] = user.username
-        #login_session(user)
-        return redirect('/',302)
+        return redirect('/', 302)
         
 
 @app.route('/logout')
@@ -297,7 +290,7 @@ def signup():
             abort(400) # missing arguments
         if session.query(User).filter_by(username = username).first() is not None:
             flash("This username Already exist")
-            return redirect('/signup',302)
+            return redirect('/signup', 302)
     user = User(username = username)
     user.hash_password(password)
     user.email = email
@@ -305,7 +298,7 @@ def signup():
     session.commit()
     login_session['logged_in'] = True
     login_session['username'] = user.username
-    return redirect(url_for('home'),302)
+    return redirect(url_for('home'), 302)
 
 
 
@@ -326,7 +319,7 @@ def get_user(id):
 def home():
     catagories = session.query(Catagory).all()
     items = session.query(Item).order_by(Item.date.desc()).limit(10)
-    return render_template('home.html',catagories = catagories, items = items )
+    return render_template('home.html', catagories = catagories, items = items)
 
 
 # items per catagory page
@@ -335,7 +328,7 @@ def itemInCatagory(catagory_name):
     catagories = session.query(Catagory).all()
     catagory = session.query(Catagory).filter_by(name = catagory_name).first()
     items = session.query(Item).filter_by(catagory_id = catagory.id).all()
-    return render_template('catagory_items.html',catagories = catagories,
+    return render_template('catagory_items.html', catagories = catagories,
                          catagory = catagory, items = items,
                          counter = len(items))
 
@@ -346,25 +339,24 @@ def itemDescription(catagory_name, item_name):
     item = session.query(Item).filter_by(title = item_name).first()
     last_update = LastUpdate(item.date)
     return render_template('itemDescription.html', item = item,
-                            lastupdate = last_update )
+                            lastupdate = last_update)
 
 
 # create item page
-@app.route('/catalog/newitem', methods = [ 'GET','POST' ] )
+@app.route('/catalog/newitem', methods = ['GET', 'POST'])
 @is_logged_in
 def add_item():
     if request.method == 'GET':
-        #return 'insinde add item'
         catagories = session.query(Catagory).all()
         return render_template('newitem.html', catagories = catagories)
     elif request.method == 'POST':
         title_ = request.form['title']
         catagory = request.form['catagory']
         description = request.form['description']
-        exists = session.query(Item).filter_by( title = title_).first()
+        exists = session.query(Item).filter_by(title = title_).first()
         if exists:
             return 'This item already exists'
-        item = Item(title = title_ )
+        item = Item(title = title_)
         item.description = description
         catagory_object = session.query(Catagory).filter_by(name = catagory).one()
         item.catagory_id = catagory_object.id
@@ -380,70 +372,70 @@ def add_item():
         session.add(item)
         session.commit()
         return redirect('/',302)
-        #return jsonify({'catagory_item':item.title})
+
 
 
 # edit item page
-@app.route('/catalog/<item_name>/edit', methods =['GET','POST'])
+@app.route('/catalog/<item_name>/edit', methods =['GET', 'POST'])
 @is_logged_in
-def edit_item( item_name ):
+def edit_item(item_name):
     item = session.query(Item).filter_by(title = item_name).one() 
     if request.method == 'GET':
-        catagories = session.query(Catagory).all()
-        return render_template('edititem.html',catagories=catagories, item_name = item.title)
+        if login_session['username'] == item.author:        
+            catagories = session.query(Catagory).all()
+            return render_template('edititem.html', catagories=catagories, \
+            item_name = item.title)
+        else:
+            return render_template('/notAuthorized.html')
     elif request.method == 'POST':
-        print 'date',item.date
-        if login_session['username'] == item.author:
-            ## deleting the previouse item
-            #session.delete(item)
-            #session.commit()
-            # Adding the passed data 
+        if login_session['username'] == item.author: 
             title_ = request.form['title']
             catagory = request.form['catagory']
             description = request.form['description']
             catagory_object = session.query(Catagory).filter_by(name = catagory).first()
-            #item.catagory_id = catagory_object.id
-            #item = Item(title = title_)
             item.description = description
             # check if there is an uploaded image
             if 'file' not in request.files:
-                print 'file not in request'
                 filename='picture.png'
             else:
-                print 'file in request'
+                # print 'file in request'
                 file = request.files['file']
                 if allowed_file(file.filename):
                     filename = secure_filename(file.filename)
                     file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                    print 'file is allowed', filename
-                    #item.image=filename
-            print 'after if',filename
+                    # item.image=filename
+                else:
+                   flash("This uploaded filetype must be .png .jpg .jpeg")
+                   return redirect(request.url, 302)
             session.query(Item).filter_by(id=item.id).\
-                        update({Item.catagory_id: catagory_object.id,\
-                        Item.title:title_,\
-                        Item.date:datetime.datetime.now(),\
-                        Item.description: description,\
-                        Item.author: login_session['username'],\
-                        Item.image:filename })
+            update({Item.catagory_id: catagory_object.id, \
+            Item.title: title_, \
+            Item.date: datetime.datetime.now(), \
+            Item.description: description, \
+            Item.author: login_session['username'], \
+            Item.image: filename })
             session.commit()
-            return redirect(url_for('home'),302)
+            return redirect(url_for('home'), 302)
         else:
             return 'You are not authorized to Edit this item'
 
 
 # delete item page
-@app.route('/catalog/<item_name>/delete', methods = ['GET','POST'])
+@app.route('/catalog/<item_name>/delete', methods = ['GET', 'POST'])
 @is_logged_in
 def delete_item(item_name):
-    item = session.query(Item).filter_by(title = item_name).one()    
+    item = session.query(Item).filter_by(title = item_name).one()
     if request.method == 'GET':
-        return render_template('deleteitem.html', item_name = item_name)
+        if login_session['username'] == item.author:  
+            return render_template('deleteitem.html', item_name = item_name)
+        else:
+            return render_template('/notAuthorized.html')
     elif request.method == 'POST':
         if login_session['username'] == item.author:
             item = session.query(Item).filter_by(title = item_name).one()
             session.delete(item)
             session.commit()
-            return redirect(url_for('home'),302)
+            return redirect(url_for('home'), 302)
         else:
             return 'You are not authorized to Delete this item'
 
@@ -459,10 +451,10 @@ def catalog_api():
         items = session.query(Item).filter_by(catagory_id = catagory.id).all()
         # {id:,name:,title:[{},{},{}]}
         for item in items:
-            catagory_dict['items'].append( item.serialize  )
-        output.append( catagory_dict )
+            catagory_dict['items'].append(item.serialize )
+        output.append(catagory_dict)
 
-    return jsonify({'catagory':output})
+    return jsonify({'catagory': output})
 
 
 # return a certain catagory api
@@ -471,26 +463,20 @@ def catagory_api(catagory_name):
     catagory = session.query(Catagory).filter_by(name = catagory_name).one()
     items = session.query(Item).filter_by(catagory_id = catagory.id).all()
     if items != None and catagory !=None:
-        output = [ item.serialize for item in items]
+        output = [item.serialize for item in items]
         return jsonify({catagory_name: output })
     return 'Item or catagory not found'
     
 
 # return a certain items api
 @app.route('/catalog/<catagory_name>/<item_name>.json')
-def item_api(catagory_name,item_name):
+def item_api(catagory_name, item_name):
     item = session.query(Item).filter_by(title = item_name).first()
     if item != None:
-        return jsonify({item_name: item.serialize })  
+        return jsonify({item_name: item.serialize })
     return 'Item or catagory not found'
-
-
-
-
-
 
 if __name__ == '__main__':
     app.secret_key=''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
     app.debug = True
-    #app.config['SECRET_KEY'] = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
     app.run(host='0.0.0.0', port=5000)
