@@ -2,7 +2,8 @@
 {% block body %}
 
 <div class="rounded mx-auto d-block card mb-3 mt-4 w-50 p-3" >
-  <h2>Login</h2>
+  <h2 class="font-weight-bold text-center">Welcome!</h2>
+  <p class="text-center">  Create your free account | <a href= {{ url_for('signup')}} > Sign-up</a></p>
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
   <form action="{{ url_for('login') }}" method=post>
       <div class="form-group">
@@ -25,7 +26,8 @@
       </div>
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
-  <h5>Login with Google</h5> 
+  <br>
+  <h5>Or Login with Google</h5> 
     <button  class="g-signin2" id="signinButton">Sign in with Google</button>
 
 </div>
