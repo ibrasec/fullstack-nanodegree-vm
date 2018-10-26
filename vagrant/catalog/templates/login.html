@@ -5,24 +5,26 @@
   <h2>Login</h2>
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
   <form action="{{ url_for('login') }}" method=post>
-    <dl>
-      <dt>Username:
-      <dd><input type=text name=username required>
-      <dt>Password:
-      <dd><input type=password name=password required>
-      <dd><input type=submit value=Login>
-    </dl>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" class="form-control" name=username id="username" aria-describedby="emailHelp" placeholder="Enter username" required>
+         {% with messages = get_flashed_messages() %}
+            {% if messages %}
+             {% for message in messages %}
+                 <span class="d-inline-block" data-toggle="popover" data-content="Disabled popover">
+                      <button class="btn btn-dangerous" style="pointer-events: none;" type="button" disabled>{{ message }}</button>
+                  </span>
+             {% endfor %}
+            {% endif %}
+         {% endwith %}
+
+      </div>
+      <div class="form-group">
+        <label for="exampleInputPassword1">Password</label>
+        <input type="password" class="form-control" name=password id="exampleInputPassword1" placeholder="Password" required>
+      </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
   </form>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        {% for message in messages %}
-            <span class="d-inline-block" data-toggle="popover" data-content="Disabled popover">
-                <button class="btn btn-dangerous" style="pointer-events: none;" type="button" disabled>{{ message }}</button>
-            </span>
-          {% endfor %}
-      {% endif %}
-    {% endwith %}
-  <br>
   <h5>Login with Google</h5> 
     <button  class="g-signin2" id="signinButton">Sign in with Google</button>
 
@@ -41,12 +43,9 @@
 <!--NEW GOOGLE SIGN IN CODE -->
 <script>
 function signInCallback(json) {
-  console.log('inside callback fuction');
-  console.log(json);
   // authResult = JSON.parse(json);
   authResult = json;
   if (authResult['code']) {
-    console.log('We got authResult, Sending it to the server...')
     // Hide the sign-in button now that the user is authorized, for example:
     $('#signinButton').attr('style', 'display: none');
       //$('#result').html('One-Time Auth Code:</br>'+ authResult['code'] + '')
