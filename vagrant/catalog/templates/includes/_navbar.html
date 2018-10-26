@@ -8,6 +8,10 @@
           <li class="nav-item">
             {% if session.logged_in %}
             <a class="nav-link text-white" href="{{ url_for('logout') }}">Logout</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white font-weight-bold text-uppercase" href="{{ url_for('add_item') }}">New-item</a>
+          </li>
             {% else %} 
           <li class="nav-item">
             <a class="nav-link text-white" href="{{ url_for('signup') }}">Sign-up</a>

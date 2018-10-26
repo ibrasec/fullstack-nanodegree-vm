@@ -3,20 +3,21 @@
 <title>New item</title>
 
 
-  <h2>New item</h2>
+  <h3>New item</h3>
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
   <form action={{url_for('add_item')}} method=post enctype=multipart/form-data id=catagoryform>
     <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
-    <h3>Title:</h3>
+    <h5>Title:</h5>
       <input type=text name=title required>
-    <h3>Description:</h3>
+    <h5>Description:</h5>
       <textarea name="description"  style="width: 400px; height: 100px;" required></textarea>
-    <h3>Catagory:</h3>
+    <h5>Catagory:</h5>
       <select name=catagory form=catagoryform>
         {% for catagory in catagories %}
         <option value="{{catagory.name}}">{{catagory.name}}</option>
         {% endfor %}
         </select> 
+    <h5>Upload an image</h5>
       <p><input type=file name=file>
       </p>
          {% with messages = get_flashed_messages() %}
@@ -28,7 +29,6 @@
              {% endfor %}
             {% endif %}
          {% endwith %}
-      <br>
     <input type=submit value=Add_item>
   </form>
   <form action={{url_for('home')}} method=post>

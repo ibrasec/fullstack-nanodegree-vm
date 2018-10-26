@@ -9,11 +9,6 @@
         <a href={{ url_for('itemInCatagory',catagory_name = catagory.name) }} class="list-group-item list-group-item-action"> {{catagory.name}} </a>
     {% endfor %}
 
-    {% if session.logged_in %}
-    <div>
-        <a  class="nav-link text-danger" href={{ url_for('add_item') }} > Add item </a>
-    {% endif %}
-    </div>
 </div>
 
 <div class="pl-4 pr-4 list-group float-md-left ">
