@@ -1,8 +1,11 @@
 {% extends 'layout.html' %}
 
 
-
+<form method=post action="">
+    
 {% block body %}
+
+<div class="rounded mx-auto d-block card mb-3 mt-4 w-50 p-3" >
   <h2>Sign-up</h2>
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
     <form action="{{ url_for('signup') }}" method=post>
@@ -18,6 +21,7 @@
              {% endfor %}
             {% endif %}
          {% endwith %}
+
       </div>
       <div class="form-group">
         <label for="exampleInputEmail1">Email address</label>
@@ -32,7 +36,58 @@
     </form>
 
   <br>
+
+    <button  class="g-signin2" id="signinButton">Sign in with Google</button>
+
+</div>
+
+
+
+
+<script>
+  $('#signinButton').click(function() {
+
+    auth2.grantOfflineAccess({'redirect_uri': 'postmessage'}).then(signInCallback);
+
+  });
+</script>
+
+
+<!--NEW GOOGLE SIGN IN CODE -->
+<script>
+function signInCallback(json) {
+  console.log('inside callback fuction');
+  console.log(json);
+  // authResult = JSON.parse(json);
+  authResult = json;
+  if (authResult['code']) {
+    console.log('We got authResult, Sending it to the server...')
+    // Hide the sign-in button now that the user is authorized, for example:
+    $('#signinButton').attr('style', 'display: none');
+      //$('#result').html('One-Time Auth Code:</br>'+ authResult['code'] + '')
+    // Send the code to the server
+    $.ajax({
+      type: 'POST',
+      url: '/oauth/google',
+      processData: false,
+      data: authResult['code'],
+      contentType: 'application/octet-stream; charset=utf-8',
+      success: function(result) {
+        // Handle or verify the server response if necessary.
+        if (result) {
+            top.location.href = '/';
+          //$('#result').html('Login Successful!</br>'+ result + '')
+        } else if (authResult['error']) {
+          console.log('There was an error: ' + authResult['error']);
+        } else {
+          $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+        }
+      }
+    });
+    console.log( authResult['code'] )
+   }
+}
+</script>
+
+
 {% endblock %}
-
-
-
