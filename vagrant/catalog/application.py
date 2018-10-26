@@ -29,14 +29,6 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
-# just to add forbidden page
-def not_authorized():
-    return render_template()
-
-
-def forbidden():
-    return render_template('/forbidden.html')
-
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -148,10 +140,6 @@ def generate_csrf_token():
 app.jinja_env.globals['csrf_token'] = generate_csrf_token
 
 
-
-
-
-
 # check if the user is logged-in
 def is_logged_in(f):
     @wraps(f)
@@ -161,7 +149,6 @@ def is_logged_in(f):
         else:
              return render_template('/forbidden.html')
     return wrap
-
 
 
 @auth.verify_password
@@ -177,8 +164,6 @@ def verify_password(username_or_token, password):
             return False
     g.user = user
     return True
-
-
 
 
 @app.route('/oauth/<provider>', methods = ['POST'])
@@ -277,7 +262,6 @@ def logout():
     return redirect(url_for('home'))
 
 
-
 @app.route('/signup', methods = ['GET','POST'])
 def signup():
     if request.method == 'GET':
@@ -299,7 +283,6 @@ def signup():
     login_session['logged_in'] = True
     login_session['username'] = user.username
     return redirect(url_for('home'), 302)
-
 
 
 # just for checking
@@ -355,13 +338,15 @@ def add_item():
         description = request.form['description']
         exists = session.query(Item).filter_by(title = title_).first()
         if exists:
-            return 'This item already exists'
+            flash('This item already exists')
+            return redirect(request.url,302)
         item = Item(title = title_)
         item.description = description
         catagory_object = session.query(Catagory).filter_by(name = catagory).one()
         item.catagory_id = catagory_object.id
         item.author = login_session['username']
         if 'file' not in request.files:
+            print 'file not in request.files', request.files
             item.image='picture.png'
         else:
             file = request.files['file']
@@ -369,10 +354,12 @@ def add_item():
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 item.image=filename
+            else:
+                flash("The uploaded file format must be .png .jpg .jpeg or gif")
+                return redirect(request.url, 302)
         session.add(item)
         session.commit()
         return redirect('/',302)
-
 
 
 # edit item page

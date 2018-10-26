@@ -5,7 +5,7 @@
 
   <h2>New item</h2>
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
-  <form action={{url_for('add_item')}} method=post id=catagoryform>
+  <form action={{url_for('add_item')}} method=post enctype=multipart/form-data id=catagoryform>
     <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
     <h3>Title:</h3>
       <input type=text name=title required>
@@ -17,9 +17,17 @@
         <option value="{{catagory.name}}">{{catagory.name}}</option>
         {% endfor %}
         </select> 
-
-      <br>
-      <br>
+      <p><input type=file name=file>
+      </p>
+         {% with messages = get_flashed_messages() %}
+            {% if messages %}
+             {% for message in messages %}
+                <div class="alert alert-warning" role="alert">
+                    {{ message }}
+                </div>
+             {% endfor %}
+            {% endif %}
+         {% endwith %}
       <br>
     <input type=submit value=Add_item>
   </form>
