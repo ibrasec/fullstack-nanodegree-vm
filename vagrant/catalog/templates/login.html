@@ -6,6 +6,7 @@
   <p class="text-center">  Create your free account | <a href= {{ url_for('signup')}} > Sign-up</a></p>
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
   <form action="{{ url_for('login') }}" method=post>
+    <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
       <div class="form-group">
         <label for="username">Username</label>
         <input type="text" class="form-control" name=username id="username" aria-describedby="emailHelp" placeholder="Enter username" required>

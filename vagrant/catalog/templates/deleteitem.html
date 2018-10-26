@@ -5,6 +5,7 @@
 <div class='item_description'>
 <h3>Delete Item</h3>
   <form action={{url_for('delete_item', item_name= item_name ) }} method=post id=catagoryform>
+    <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
     <p>Are you sure you want to delete {{item_name}}</p>
     <input type=submit value=Submit>
   </form>

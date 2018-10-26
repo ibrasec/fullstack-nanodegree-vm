@@ -6,6 +6,7 @@
   <h2>New item</h2>
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
   <form action={{url_for('add_item')}} method=post id=catagoryform>
+    <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
     <h3>Title:</h3>
       <input type=text name=title required>
     <h3>Description:</h3>

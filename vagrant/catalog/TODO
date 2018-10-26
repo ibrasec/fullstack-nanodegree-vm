@@ -8,7 +8,9 @@ Done: LOGout button
 Done: OAuth2
     :  README
 Done: nested variable
-    : notfound page
+Done: notfound page
     : comments and PEP8
-    : csrf
+Done: csrf
+    : verift emails
+    : verify passowrd
 
