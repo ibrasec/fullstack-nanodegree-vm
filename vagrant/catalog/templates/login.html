@@ -28,8 +28,9 @@
   </form>
   <br>
   <h5>Or Login with Google</h5> 
-    <button  class="g-signin2" id="signinButton">Sign in with Google</button>
 
+    <div id="result"></div>
+    <button  class="g-signin2" id="signinButton">Sign in with Google</button>
 </div>
 
 
@@ -50,7 +51,7 @@ function signInCallback(json) {
   if (authResult['code']) {
     // Hide the sign-in button now that the user is authorized, for example:
     $('#signinButton').attr('style', 'display: none');
-      //$('#result').html('One-Time Auth Code:</br>'+ authResult['code'] + '')
+    $('#result').html('you will be redirected soon, please wait... ')
     // Send the code to the server
     $.ajax({
       type: 'POST',
