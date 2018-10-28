@@ -11,17 +11,17 @@ This repository consists of the following:
 
 - **vagrant**: Is the main directory hosting the python code and the related web codes,files and images.
 
--- **catalog:** This is where you could find the main application used to activate the web service using python, you will find three main folders:
+- **catalog:** This is where you could find the main application used to activate the web service using python, you will find three main folders:
 
---- **static:** which include **img** folder that stores images to be displayed to the users
+- **static:** which include **img** folder that stores images to be displayed to the users
 
---- **templates**: This is where you find html files
+- **templates**: This is where you find html files
 
--- **applicaiton.py**: is the file that has the python code, this is the essential code used to activate web service
+- **applicaiton.py**: is the file that has the python code, this is the essential code used to activate web service
 
--- **models.py**: is the python file that is sued to defind user, item and catagory classes
+- **models.py**: is the python file that is sued to defind user, item and catagory classes
 
--- **load_catagories.py**: is the code used to load the catalog.db with some catagories if the database is empty.
+- **load_catagories.py**: is the code used to load the catalog.db with some catagories if the database is empty.
 
 
 

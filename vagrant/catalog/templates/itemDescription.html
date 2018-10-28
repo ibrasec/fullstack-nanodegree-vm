@@ -2,7 +2,7 @@
 
 {% block body %}
 <div class="rounded mx-auto d-block card mb-3 mt-4 w-50 p-3" >
-  <img class=" card-img-top" src="/static/img/{{item.image}}" alt="Card image cap"  width="4" height="300" >
+  <img class="d-block card mx-auto" src="/static/img/{{item.image}}" alt="Card image cap" width="220"  >
   <div class="card-body">
     <h5 class="card-title">{{item.title}}</h5>
     <p class="card-text">{{item.description}}</p>
@@ -18,9 +18,5 @@
     {% endif %}
 </div>
 
-
-
 {% endblock %}
-
-
 
