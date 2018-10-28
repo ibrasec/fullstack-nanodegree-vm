@@ -1,4 +1,4 @@
-- Introduction
+Introduction
 --------------
 This code is part of the fullstack nanodegree project, it is a website service
 
@@ -19,7 +19,7 @@ this website also supports API calls, just follows the steps mentioned under "Ho
  use section"
 
 
-- File hierarchy
+File hierarchy
 --------------
 This repository consists of the following:
 - **vagrant**: Is the main directory hosting the python code and the related web codes,files and images.
@@ -33,7 +33,7 @@ This repository consists of the following:
 
 
 
-- How to use
+How to use
 ------------
 
 - Make sure you have virtualbox installed ( i used version 5.1.38, version 5.2 was tested 
@@ -113,15 +113,13 @@ vagrant@vagrant:/vagrant/catalog$ python application.py
  happy browsing.
 
 
--Supported images
+Supported images
 ----------------
-To add an item with an image, the following image extensions are supported
-
-'png','jpeg','jpg','gif'
+To add an item with an image, the following image extensions are supported ( png,jpeg,jpg and gif)
 
 Any other extension is not supported
 
-- API support
+API support
 --------------
 
 The website can respond to GET requests comming from REST tools like postman or curl
@@ -155,7 +153,7 @@ http://localhost:5000/catalog/<<The catagory name>>/<<The item name>>.json
 ```
 
 LICENSE
-
+--------
 ibrasec/fullstack-nanodegree-vm is a repository forked from udacity 'https://github.com/udacity/fullstack-nanodegree-vm', any license applied by udacity to its main repositories applied to this. However if no license is applied, the following is the license to this repository:
 ibrasec/fullstack-nanodegree-vm respository is a free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
