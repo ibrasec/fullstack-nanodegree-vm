@@ -24,6 +24,19 @@ This repository consists of the following:
 - **load_catagories.py**: is the code used to load the catalog.db with some catagories if the database is empty.
 
 
+Available Features
+------------------
+- JSON endpoint with all required content.
+- The website read category and item information from a database.
+- The website include a form allowing users to add new items and correctly processes these forms.
+- The website include a form to update a record in the database and correctly processes this form.
+- The website include a way to delete an item from the catalog.
+- create, delete, and update operations consider authorization status prior to execution.
+- The website implement a third party authentication and authorization service.
+- There a “login” and “logout” button/link in the website.
+- Added CRUD functionality for image handling.
+- Implemented CSRF protection to CRUD operations.
+
 
 
 How to use
