@@ -432,12 +432,15 @@ def catalog_api():
 # return a certain catagory api
 @app.route('/catalog/<catagory_name>.json')
 def catagory_api(catagory_name):
-    catagory = session.query(Catagory).filter_by(name=catagory_name).one()
+    try:
+        catagory = session.query(Catagory).filter_by(name=catagory_name).one()
+    except:
+        # this is to notify the user if he is looking for
+        # an undefined catagory name
+        return jsonify({'catagory name was not found': catagory_name})
     items = session.query(Item).filter_by(catagory_id=catagory.id).all()
-    if items is not None and catagory is not None:
-        output = [item.serialize for item in items]
-        return jsonify({catagory_name: output})
-    return 'Item or catagory not found'
+    output = [item.serialize for item in items]
+    return jsonify({catagory_name: output})
 
 
 # return a certain items api
@@ -446,7 +449,10 @@ def item_api(catagory_name, item_name):
     item = session.query(Item).filter_by(title=item_name).first()
     if item is not None:
         return jsonify({item_name: item.serialize})
-    return 'Item or catagory not found'
+    # this is to notify the user if he is looking for
+    # an undefined catagory or item name
+    return jsonify({'item or catagory name was not found': [catagory_name,
+                                                            item_name]})
 
 
 # Not found page
