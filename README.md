@@ -1,33 +1,26 @@
 Introduction
 --------------
-This code is part of the fullstack nanodegree project, it is a website service
-
-programmed using Flask which is python based framework, this website shows a 
-
-group of catagories, each catagory can have a group of items, where each item
-
-represents a Title and a short description
-
- as example: the "Book" catagory can have the following items, 
-
-"Learn python", "Learn English", "Maths"...etc
-
-You can show all the items for a certain catagory, and you could create your own.
-
-this website also supports API calls, just follows the steps mentioned under "How to
-
- use section"
+This code is part of the fullstack nanodegree project, it is a website service programmed using Flask which is python based framework, this website shows a group of catagories, each catagory can have a group of items, where each item represents a Title and a short description
+as example: the "Book" catagory can have the following items, "Learn python", "Learn English", "Maths"...etc
+You can show all the items for a certain catagory, and you could create your own. this website also supports API calls and uploading item images.
 
 
 File hierarchy
 --------------
 This repository consists of the following:
+
 - **vagrant**: Is the main directory hosting the python code and the related web codes,files and images.
+
 -- **catalog:** This is where you could find the main application used to activate the web service using python, you will find three main folders:
+
 --- **static:** which include **img** folder that stores images to be displayed to the users
+
 --- **templates**: This is where you find html files
+
 -- **applicaiton.py**: is the file that has the python code, this is the essential code used to activate web service
+
 -- **models.py**: is the python file that is sued to defind user, item and catagory classes
+
 -- **load_catagories.py**: is the code used to load the catalog.db with some catagories if the database is empty.
 
 
