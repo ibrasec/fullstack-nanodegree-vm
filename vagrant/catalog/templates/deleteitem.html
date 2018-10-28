@@ -3,18 +3,23 @@
 {% block body %}
 
 <div class='item_description'>
-<h3>Delete Item</h3>
+ <div class="rounded mx-auto d-block card mb-3 mt-4 w-50 p-3" >
+  <img class="border-0 d-block card mx-auto" src="/static/img/trash-can.png" alt="Card image cap" width="220"  >
   <form action={{url_for('delete_item', item_name= item_name ) }} method=post id=catagoryform>
-    <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
-    <p>Are you sure you want to delete {{item_name}}</p>
-    <input type=submit value=Submit>
+   <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
+    <br>
+    <br>
+   <h5 class="text">Are you sure you want to delete {{item_name}} ?</h5>
+   <input type=submit value=Submit>
   </form>
 
   <form action={{url_for('home')}} method=get>
-    <input type=submit value=Cancel>
+   <input type=submit value=Cancel>
   </form>
-
+ </div>
 </div>
 
 
 {% endblock %}
+
+
