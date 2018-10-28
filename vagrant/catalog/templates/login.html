@@ -62,6 +62,7 @@ function signInCallback(json) {
       contentType: 'application/octet-stream; charset=utf-8',
       success: function(result) {
         // Handle or verify the server response if necessary.
+        console.log('SOmeinth is caught'+authResult['code'])
         if (result) {
             top.location.href = '/';
           //$('#result').html('Login Successful!</br>'+ result + '')

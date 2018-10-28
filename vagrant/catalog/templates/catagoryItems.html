@@ -7,10 +7,9 @@
 
 <div class="pr-4 list-group border-right float-md-left ">
 
-    <div class="catagories"><h3>Catagories</h3>
-    </div>
+    <h3>Catagories</h3>
         {% for catagory in catagories %}
-                <a href={{ url_for('itemInCatagory',catagory_name = catagory.name ) }} class="list-group-item "> {{catagory.name}} </a>
+                <a href={{ url_for('catagory_items',catagory_name = catagory.name ) }} class="list-group-item "> {{catagory.name}} </a>
         {% endfor %}
     <hr width="3" size="500">
     <span class="border-right"></span>
@@ -26,7 +25,7 @@
 
 
     {% for item in items %}
-            <a href={{ url_for('itemDescription',catagory_name = catagory.name, item_name = item.title) }} class="list-group-item "> {{item.title}} </a>
+            <a href={{ url_for('item_description',catagory_name = catagory.name, item_name = item.title) }} class="list-group-item "> {{item.title}} </a>
     {% endfor %}
     </div>
 

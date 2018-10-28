@@ -1,15 +1,15 @@
 Done: Reuqired field
 Done: Description to be Long text field instead of short text filed
 Done: Add images to items if available, otherwise add default image according to its catagory
-    : Make catagories added by default
+Done: Make catagories added by default
 Done: Login page 
 Done: LOGIN button
 Done: LOGout button
 Done: OAuth2
-    :  README
+Done:  README
 Done: nested variable
 Done: notfound page
-    : comments and PEP8
+Done: comments and PEP8
 Done: csrf
     : verift emails
     : verify passowrd
