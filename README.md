@@ -53,8 +53,8 @@ or by using the git command as follows:
 
 
 ```
- $ git clone https://github.com/ibrasec/fullstack-nanodegree-vm
- $ cd fullstack-nanodegree-vm/vagrant
+ $ git clone https://github.com/ibrasec/item-catalog-vm
+ $ cd item-catalog-vm/vagrant
 
 ```
 
@@ -160,8 +160,8 @@ http://localhost:5000/catalog/<<The catagory name>>/<<The item name>>.json
 
 LICENSE
 --------
-ibrasec/fullstack-nanodegree-vm is a repository forked from udacity 'https://github.com/udacity/fullstack-nanodegree-vm', any license applied by udacity to its main repositories applied to this. However if no license is applied, the following is the license to this repository:
-ibrasec/fullstack-nanodegree-vm respository is a free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ibrasec/item-catalog-vm is a repository forked from udacity 'https://github.com/udacity/fullstack-nanodegree-vm', any license applied by udacity to its main repositories applied to this. However if no license is applied, the following is the license to this repository:
+ibrasec/item-catalog-vm respository is a free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-ibrasec/fullstack-nanodegree-vm is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ibrasec/item-catalog-vm is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
