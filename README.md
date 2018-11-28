@@ -1,6 +1,6 @@
 Introduction
 --------------
-This code is part of the fullstack nanodegree project, it is a website service programmed using Flask which is python based framework, this website shows a group of catagories, each catagory can have a group of items, where each item represents a Title and a short description
+item-catalog-vm is part of the fullstack nanodegree project, it is a website service programmed using Flask which is python based framework, this website shows a group of catagories, each catagory can have a group of items, where each item represents a Title and a short description
 as example: the "Book" catagory can have the following items, "Learn python", "Learn English", "Maths"...etc
 You can show all the items for a certain catagory, and you could create your own. this website also supports API calls and uploading item images.
 
