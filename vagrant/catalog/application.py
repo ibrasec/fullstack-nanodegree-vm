@@ -97,16 +97,7 @@ session = DBSession()
 
 
 # check if the Database is already filled with catagories
-def load_database():
-    catagories = session.query(Catagory).all()
-    if catagories:
-        return 'catagories exists... Exiting...'
-    else:
-        print 'Loading pre-defined catagories...'
-        print 'Please wait...'
-        load_catagories.create_catagories()
-        print 'All catagories has been loaded'
-
+load_catagories.create_catagories()
 
 # ----- CSRF section -------------
 @app.before_request
@@ -463,7 +454,6 @@ def page_not_found(e):
 
 
 if __name__ == '__main__':
-    load_database()
     app.secret_key = ''.join(random.choice(
                 string.ascii_uppercase + string.digits) for x in xrange(32))
     app.debug = True
