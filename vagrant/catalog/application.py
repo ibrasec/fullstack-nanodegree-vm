@@ -163,7 +163,7 @@ def login_provider(provider):
         try:
             # Upgrade the authorization code into a credentials object
             oauth_flow = flow_from_clientsecrets(
-                    'client_secrets.json', scope='')
+                    CLIENTSECRET, scope='')
             oauth_flow.redirect_uri = 'postmessage'
             credentials = oauth_flow.step2_exchange(auth_code)
         except FlowExchangeError:
