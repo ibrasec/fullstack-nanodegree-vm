@@ -456,7 +456,12 @@ def page_not_found(e):
     # note that we set the 404 status explicitly
     return render_template('404.html'), 404
 
+# Add google domain verification for http://itemcatalog.68.183.70.105.xip.io/
+@app.route('/google060d2d080b50a76c.html', methods=['GET'])
+def googleVerify():
+    return render_template('/google060d2d080b50a76c.html'), 200
 
+  
 if __name__ == '__main__':
     app.secret_key = ''.join(random.choice(
                 string.ascii_uppercase + string.digits) for x in xrange(32))
