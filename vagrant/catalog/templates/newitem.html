@@ -5,7 +5,7 @@
 
   <h3>New item</h3>
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
-  <form action={{url_for('add_item')}} method=post enctype=multipart/form-data id=catagoryform>
+  <form action={{url_for('add_item')}} method=post enctype=multipart/form-data id=catagoryform autocomplete="off">
     <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
     <h5>Title:</h5>
       <input type=text name=title required>
