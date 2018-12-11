@@ -20,7 +20,7 @@ class User(Base):
     username = Column(String(32), index=True)
     picture = Column(String)
     email = Column(String)
-    password_hash = Column(String(64))
+    password_hash = Column(String(120))
 
     def hash_password(self, password):
         self.password_hash = pwd_context.encrypt(password)
@@ -80,6 +80,11 @@ class Item(Base):
                 }
 
 
+# comment the below if you are using postgresql and not sqlite
 engine = create_engine('sqlite:///catalog.db',
                        connect_args={'check_same_thread': False})
+# un-comment the below code if You are using postgresql and not sqlite,
+# be aware of the username and password
+# engine = create_engine('postgresql://username:password@localhost:5432/catalog')
+
 Base.metadata.create_all(engine)
