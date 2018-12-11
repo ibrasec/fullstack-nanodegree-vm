@@ -92,8 +92,12 @@ def LastUpdate(item_date):
 
 auth = HTTPBasicAuth()
 
-engine = create_engine(
-        'sqlite:///catalog.db', connect_args={'check_same_thread': False})
+# comment the below to use postgresql instead of sqlite
+engine = create_engine('sqlite:///catalog.db',
+                       connect_args={'check_same_thread': False})
+# un-comment the below to use postgres instead of sqlite
+# update the username, password and the database name accordingly
+#engine = create_engine('postgresql://username:password@localhost:5432/catalog')
 
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
