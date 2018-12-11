@@ -12,7 +12,7 @@ from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 import httplib2
 import requests
-import os
+import os, subprocess
 import datetime
 import json
 import random
@@ -24,10 +24,14 @@ from werkzeug.utils import secure_filename
 
 
 # defining variables
-UPLOAD_FOLDER = './static/img/'
+UPLOAD_FOLDER = subprocess.check_output(['locate', '-r',
+                                        os.getcwd() + '.*static/img$']).strip()
+CLIENTSECRET = subprocess.check_output(['locate', '-r',
+                                        os.getcwd() + '.*/client_secret']).strip()
+
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 CLIENT_ID = json.loads(
-            open('client_secrets.json', 'r').read())['web']['client_id']
+            open(CLIENTSECRET, 'r').read())['web']['client_id']
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
